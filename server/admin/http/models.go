@@ -60,3 +60,17 @@ type (
 		AdvId cid.Cid `json:"adv_id"`
 	}
 )
+
+type (
+	RandomAdReq struct {
+		XpCount   int    `json:"xp_count"`
+		MhsCount  int    `json:"mhs_count"`
+		ContextID string `json:"context_id"`
+		Override  bool   `json:"override"`
+	}
+	RandomAdRes struct {
+		AdvId cid.Cid  `json:"adv_id"`
+		Mhs   []string `json:"mhs"`
+		Cids  []string `json:"cids"`
+	}
+)

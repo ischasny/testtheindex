@@ -2,6 +2,7 @@ package mirror_test
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 	"testing"
 	"time"
@@ -25,6 +26,12 @@ const (
 	testCheckInterval   = testEventualTimeout / 10
 	testRandomSeed      = 1413
 )
+
+func TestTest(t *testing.T) {
+	c, err := cid.Decode("12206c544ebf96acf262649ce18e280c3af1fa820185adfdf3dada58bb2cf3ad2bfa")
+	require.NoError(t, err)
+	fmt.Print(c)
+}
 
 func newTestContext(t *testing.T) context.Context {
 	ctx, cancel := context.WithTimeout(context.Background(), testContextTimeout)

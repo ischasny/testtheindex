@@ -2,26 +2,36 @@ package adminserver
 
 import (
 	"context"
+	"errors"
 	"net"
 	"net/http"
+	"sync"
 
+	provider "github.com/filecoin-project/index-provider"
 	"github.com/filecoin-project/index-provider/engine"
 	"github.com/filecoin-project/index-provider/supplier"
 	"github.com/gorilla/mux"
 	logging "github.com/ipfs/go-log/v2"
+	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/host"
+	"github.com/libp2p/go-libp2p/core/peer"
+	"github.com/multiformats/go-multihash"
 )
 
 var log = logging.Logger("adminserver")
+var mhsByCtxId sync.Map
 
 type Server struct {
 	server *http.Server
+	p      crypto.PrivKey
 	l      net.Listener
 	h      host.Host
 	e      *engine.Engine
 }
 
-func New(h host.Host, e *engine.Engine, cs *supplier.CarSupplier, o ...Option) (*Server, error) {
+func New(h host.Host, priv crypto.PrivKey, e *engine.Engine, cs *supplier.CarSupplier, o ...Option) (*Server, error) {
+	mhsByCtxId = sync.Map{}
+
 	opts, err := newOptions(o...)
 	if err != nil {
 		return nil, err
@@ -38,7 +48,15 @@ func New(h host.Host, e *engine.Engine, cs *supplier.CarSupplier, o ...Option) (
 		ReadTimeout:  opts.readTimeout,
 		WriteTimeout: opts.writeTimeout,
 	}
-	s := &Server{server, l, h, e}
+	s := &Server{server, priv, l, h, e}
+
+	s.e.RegisterMultihashLister(func(ctx context.Context, providerID peer.ID, contextID []byte) (provider.MultihashIterator, error) {
+		mhs, ok := mhsByCtxId.Load(string(contextID))
+		if !ok {
+			return nil, errors.New("unknown context id")
+		}
+		return provider.SliceMultihashIterator(mhs.([]multihash.Multihash)), nil
+	})
 
 	// Set protocol handlers
 	r.HandleFunc("/admin/announce", s.announceHandler).
@@ -61,6 +79,9 @@ func New(h host.Host, e *engine.Engine, cs *supplier.CarSupplier, o ...Option) (
 
 	r.HandleFunc("/admin/list/car", cHandler.handleList).
 		Methods(http.MethodGet)
+
+	r.HandleFunc("/admin/randomAd", s.randomAdHandler).
+		Methods(http.MethodPost)
 
 	return s, nil
 }

@@ -85,6 +85,58 @@ var indexFlags = []cli.Flag{
 	metadataFlag,
 }
 
+var (
+	randomAdXpCountValue int
+	randomAdXpCountFlag  = &cli.IntFlag{
+		Name:        "xpCount",
+		Usage:       "Number of extended providers to generate. Specify zero for a regular ad.",
+		Aliases:     []string{"x"},
+		Destination: &randomAdXpCountValue,
+		DefaultText: "0",
+	}
+)
+
+var (
+	randomAdMhsCountValue int
+	randomAdMhsCountFlag  = &cli.IntFlag{
+		Name:        "mhsCount",
+		Usage:       "Number of multihashes to generate for the ad. Specify non-zero value for a regular ad.",
+		Aliases:     []string{"m"},
+		Destination: &randomAdMhsCountValue,
+		DefaultText: "0",
+	}
+)
+
+var (
+	randomAdContextIDValue string
+	randomAdContextIDFlag  = &cli.StringFlag{
+		Name:        "contextId",
+		Usage:       "Context ID of the ad.",
+		Aliases:     []string{"c"},
+		Destination: &randomAdContextIDValue,
+		DefaultText: "",
+	}
+)
+
+var (
+	randomAdOverrideValue bool
+	randomAdOverrideFlag  = &cli.BoolFlag{
+		Name:        "override",
+		Usage:       "Override flag of the ad.",
+		Aliases:     []string{"o"},
+		Destination: &randomAdOverrideValue,
+		DefaultText: "false",
+	}
+)
+
+var randomAdFlags = []cli.Flag{
+	randomAdXpCountFlag,
+	randomAdMhsCountFlag,
+	randomAdContextIDFlag,
+	randomAdOverrideFlag,
+	adminAPIFlag,
+}
+
 var registerFlags = []cli.Flag{
 	indexerFlag,
 	addrFlag,
@@ -153,7 +205,7 @@ var (
 		Usage:       "Admin HTTP API listen address",
 		Aliases:     []string{"l"},
 		EnvVars:     []string{"PROVIDER_LISTEN_ADMIN"},
-		Value:       "http://localhost:3102",
+		DefaultText: "http://localhost:3102",
 		Destination: &adminAPIFlagValue,
 	}
 )

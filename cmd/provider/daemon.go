@@ -160,6 +160,7 @@ func daemonCommand(cctx *cli.Context) error {
 
 	adminSvr, err := adminserver.New(
 		h,
+		privKey,
 		eng,
 		cs,
 		adminserver.WithListenAddr(addr),

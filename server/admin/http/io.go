@@ -111,3 +111,15 @@ func marshalToJson(w io.Writer, src interface{}) (int64, error) {
 	written, err := w.Write(body)
 	return int64(written), err
 }
+
+func (er *RandomAdReq) ReadFrom(r io.Reader) (int64, error) {
+	return unmarshalAsJson(r, er)
+}
+
+func (er *RandomAdRes) WriteTo(w io.Writer) (int64, error) {
+	return marshalToJson(w, er)
+}
+
+func (er *RandomAdRes) ReadFrom(r io.Reader) (int64, error) {
+	return unmarshalAsJson(r, er)
+}

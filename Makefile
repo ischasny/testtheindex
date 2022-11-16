@@ -6,12 +6,13 @@ COMMIT ?= $(shell git rev-parse --short HEAD)
 CLEAN ?= $(shell git diff --quiet --exit-code || echo '-SNAPSHOT')
 VERSION = $(TAG)$(CLEAN)-$(COMMIT)
 
+
 .PHONY: all
 all: vet test build
 
 .PHONY: build
 build:
-	go build -ldflags="-X 'main.version=$(VERSION)'" ./cmd/provider 
+	GOARCH = "amd64" go build -ldflags="-X 'main.version=$(VERSION)'" ./cmd/provider 
 
 .PHONY: docker
 docker: clean
